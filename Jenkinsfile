@@ -3,9 +3,14 @@ pipeline {
         docker { image 'openjdk:17.0.2' }
     }
     stages {
-        stage("Start") {
+        stage("Show Working Branch") {
             steps {
-                echo 'Start spring boot project'
+                echo 'Building...' + env.BRANCH_NAME
+            }
+        }
+        stage("Security Test Stage") {
+            steps {
+                sh "./mvnw snyk:test"
             }
         }
     }
