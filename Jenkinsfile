@@ -15,7 +15,7 @@ pipeline {
         }
         stage("Security Test Stage") {
             steps {
-                sh "./mvnw snyk:test"
+                sh "./mvnw snyk:test --fail-on"
             }
         }
     }
