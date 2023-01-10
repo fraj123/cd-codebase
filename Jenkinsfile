@@ -13,9 +13,35 @@ pipeline {
                 sh "./mvnw clean install -Dsnyk.skip -DskipTests=true -Dmaven.test.failure.ignore=true sonar:sonar -Dsonar.projectKey=$env.SONAR_PROJECT -Dsonar.host.url=$env.SONAR_HOST -Dsonar.login=$env.SONAR_TOKEN"
             }
         }
+        stage("Unit Test stage") {
+            steps {
+                sh "./mvnw test -Dsnyk.skip"
+            }
+        }
         stage("Security Test Stage") {
             steps {
                 sh "./mvnw snyk:monitor"
+            }
+        }
+        stage("Build") {
+            steps {
+                sh "./mvnw install -Dsnyk.skip"
+            }
+        }
+        stage("Build Docker Image") {
+            steps {
+                sh "./mvnw spring-boot:build-image -Dsnyk.skip"
+            }
+        }
+        stage("Tag docker image") {
+            steps {
+                sh "docker tag cd-codebase:0.0.1-SNAPSHOT $DOCKER_HUB_LOGIN_USER/cd-codebase"
+            }
+        }
+        stage("Push Docker image to Docker Hub") {
+            steps {
+                sh "docker login --username $DOCKER_HUB_LOGIN_USER --password $DOCKER_HUB_LOGIN_PASS"
+                sh "docker push $DOCKER_HUB_LOGIN_USER/ci-codebase"
             }
         }
     }
