@@ -35,13 +35,13 @@ pipeline {
         }
         stage("Tag docker image") {
             steps {
-                sh "docker tag cd-codebase:0.0.1-SNAPSHOT $DOCKER_HUB_LOGIN_USER/cd-codebase"
+                sh "docker tag cardb:0.0.1-SNAPSHOT $DOCKER_HUB_LOGIN_USER/cardb"
             }
         }
         stage("Push Docker image to Docker Hub") {
             steps {
                 sh "docker login --username $DOCKER_HUB_LOGIN_USER --password $DOCKER_HUB_LOGIN_PASS"
-                sh "docker push $DOCKER_HUB_LOGIN_USER/ci-codebase"
+                sh "docker push $DOCKER_HUB_LOGIN_USER/cardb"
             }
         }
     }
