@@ -44,5 +44,10 @@ pipeline {
                 sh "docker push $DOCKER_HUB_LOGIN_USER/cardb"
             }
         }
+        stage("Deploy artifacts") {
+            steps {
+                sh "./mvnw deploy -Dsnyk.skip"
+            }
+        }
     }
 }
