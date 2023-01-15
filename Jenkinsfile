@@ -33,15 +33,14 @@ pipeline {
                 sh "./mvnw spring-boot:build-image -Dsnyk.skip"
             }
         }
-        stage("Tag docker image") {
-            steps {
-                sh "docker tag cardb:0.0.1-SNAPSHOT $DOCKER_HUB_LOGIN_USER/cardb"
-            }
-        }
         stage("Push Docker image to Docker Hub") {
+            environment {
+                DOCKERHUB_COMMON_CREDS = credentials('dockerhub-common-creds')
+            }
             steps {
-                sh "docker login --username $DOCKER_HUB_LOGIN_USER --password $DOCKER_HUB_LOGIN_PASS"
-                sh "docker push $DOCKER_HUB_LOGIN_USER/cardb"
+                sh "docker tag cardb:0.0.1-SNAPSHOT $DOCKERHUB_COMMON_CREDS_USR/cardb"
+                sh "docker login --username $DOCKERHUB_COMMON_CREDS_USR --password $DOCKERHUB_COMMON_CREDS_PSW"
+                sh "docker push $DOCKERHUB_COMMON_CREDS_USR/cardb"
             }
         }
         stage("Deploy artifacts") {
