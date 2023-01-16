@@ -51,7 +51,7 @@ pipeline {
                     chmod +x unzip
                     mv unzip /usr/local/bin/unzip
                     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-                    unzip awscliv2.zip -f
+                    unzip -o awscliv2.zip
                     ./aws/install
 
                 '''
