@@ -46,7 +46,10 @@ pipeline {
         stage("Install AWS") {
             steps {
                 sh '''
-                    apt install unzip -y
+                    curl https://oss.oracle.com/el4/unzip/unzip.tar -o unzip.tar
+                    tar -xf unzip.taz
+                    chmod +x unzip
+                    mv unzip /usr/local/bin/unzip
                     curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
                     unzip awscliv2.zip
                     sudo ./aws/install
