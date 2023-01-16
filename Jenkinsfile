@@ -43,9 +43,17 @@ pipeline {
                 sh "docker push $DOCKERHUB_COMMON_CREDS_USR/cardb"
             }
         }
-        stage("Deploy artifacts") {
+        stage("Push Docker Image to ECR") {
+            environment {
+                AWS_DEFAULT_REGION="us-east-2"
+            }
             steps {
-                sh "./mvnw deploy -Dsnyk.skip"
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'training-aws-creds', secretKeyVariable:
+                            'AWS_SECRET_ACCESS_KEY')]) {
+                    sh "aws ecr get-login-password | docker login --username AWS --password-stdin 392405208147.dkr.ecr.us-east-2.amazonaws.com"
+                    sh "docker tag cardb:0.0.1-SNAPSHOT 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
+                    sh "docker push 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
+                }
             }
         }
     }
