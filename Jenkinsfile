@@ -76,9 +76,9 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'training-deploy-creds', keyFileVariable: 'indentityFileName', usernameVariable: 'userName')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'training-deploy-creds', keyFileVariable: 'identityFileName', usernameVariable: 'userName')]) {
                     script {
-                        sleep 60
+                        sleep 15
                         def remote = [ name: server_01.name, host: server_01.host, user: userName, identityFile: identityFileName, allowAnyHosts: true]
                         sshCommand remote: remote, command: "docker ps"
                     }
