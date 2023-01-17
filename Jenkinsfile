@@ -70,13 +70,17 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
-            steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'training-deploy-creds', keyFileVariable: 'indentityFileName', usernameVariable: 'userName')]) {
-                    script {
-                        def remote = [ name: "Deploy Server", host: "52.14.182.68", user: userName, identityFile: identityFileName, allowAnyHosts: true]
-                        sshCommand remote: remote, command: "docker ps"
-                    }
+        withCredentials([sshUserPrivateKey(credentialsId: 'training-deploy-creds', keyFileVariable: 'indentityFileName', usernameVariable: 'userName')]) {
+            def remote = [:]
+            remote.name = "Deploy Server"
+            remote.host = "52.14.182.68"
+            remote.user = userName
+            remote.identityFile = identityFileName
+            remote.allowAnyHosts = true
+            sshCommand remote: remote, command: "docker ps"
+            stage('Deploy') {
+                steps {
+                    sshCommand remote: remote, command: "docker ps"
                 }
             }
         }
