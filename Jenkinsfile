@@ -72,9 +72,9 @@ pipeline {
         }
         stage('Deploy') {
             steps {
-                withCredentials([sshUserPrivateKey(credentialsId: 'training-deploy-creds', keyFileVariable: 'KEY')]) {
+                withCredentials([sshUserPrivateKey(credentialsId: 'training-deploy-creds', keyFileVariable: 'keyfile')]) {
                     sh '''
-                        ssh -i ${KEY} 52.14.182.68 -C 'docker ps'
+                        ssh -i ${keyfile} ec2-user@52.14.182.68 -C 'docker ps'
                     '''
                 }
             }
