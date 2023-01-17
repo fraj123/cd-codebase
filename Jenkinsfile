@@ -79,11 +79,12 @@ pipeline {
                     script {
                         sleep 15
                         def remote = [:];
-                        remote.name: "Deploy_Server";
-                        remote.host: "52.14.130.34";
-                        remote.user: sshUser;
-                        remote.identityFile: sshUser;
-                        remote.allowAnyHosts: true;
+                        remote.name = "Deploy_Server";
+                        remote.host = "52.14.130.34";
+                        remote.user = sshUser;
+                        remote.identityFile = sshUser;
+                        remote.allowAnyHosts = true;
+
                         sshCommand remote: remote, command: "docker ps"
                     }
                 }
