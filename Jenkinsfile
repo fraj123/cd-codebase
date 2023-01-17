@@ -1,6 +1,6 @@
 pipeline {
     agent {
-        docker { image 'openjdk:17.0.2' }
+        docker { image 'openjdk:17.0.2-jdk-bullseye' }
     }
     stages {
         stage("Show Working Branch") {
