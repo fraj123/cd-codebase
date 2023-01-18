@@ -84,8 +84,12 @@ pipeline {
                         remote.user = sshUser;
                         remote.identityFile = sshKey;
                         remote.allowAnyHosts = true;
-
-                        sshCommand remote: remote, command: "docker ps"
+                        sshCommand remote: remote, command: "aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 392405208147.dkr.ecr.us-east-2.amazonaws.com"
+                        sshCommand remote: remote, command: "docker stop cardb"
+                        sshCommand remote: remote, command: "docker rm cardb"
+                        sshCommand remote: remote, command: "docker rmi 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb"
+                        sshCommand remote: remote, command: "docker pull 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
+                        sshCommand remote: remote, command: "docker run -d -p 8080:8080 --name cardb 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
                     }
                 }
             }
