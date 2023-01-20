@@ -105,7 +105,7 @@ pipeline {
                                         mv ./kubectl ~/.local/bin/kubectl
                                         echo "PATH=\$PATH:~/.local/bin" >> ~/.bashrc
                                         source ~/.bashrc
-                                        aws eks --region us-east-2 update-kubeconfig --name eks_test-eks-0NTOw0js
+                                        aws eks --region us-east-2 update-kubeconfig --name test-eks-0NTOw0js
                                         kubectl apply -f deployment.yaml
                                     '''
                             }
