@@ -70,7 +70,7 @@ pipeline {
                 }
             }
         }
-        stage('Deploy') {
+        stage('Deploy on EC2') {
             steps {
                 withCredentials([sshUserPrivateKey(
                 credentialsId: 'training-deploy-creds', 
