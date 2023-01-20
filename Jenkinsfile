@@ -101,10 +101,7 @@ pipeline {
                                  sh '''
                                         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
                                         chmod +x kubectl
-                                        mkdir -p ~/.local/bin
-                                        mv ./kubectl ~/.local/bin/kubectl
-                                        echo "PATH=\$PATH:~/.local/bin" >> ~/.bashrc
-                                        source ~/.bashrc
+                                        mv kubectl /usr/local/bin/
                                         aws eks --region us-east-2 update-kubeconfig --name test-eks-0NTOw0js
                                         kubectl apply -f deployment.yaml
                                     '''
