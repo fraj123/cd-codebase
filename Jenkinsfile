@@ -65,30 +65,6 @@ pipeline {
                 }
             }
         }
-        stage('Deploy on EC2') {
-            steps {
-                withCredentials([sshUserPrivateKey(
-                credentialsId: 'training-deploy-creds', 
-                keyFileVariable: 'sshKey', 
-                usernameVariable: 'sshUser')]) {
-                    script {
-                        sleep 15
-                        def remote = [:];
-                        remote.name = "Deploy_Server";
-                        remote.host = "52.14.130.34";
-                        remote.user = sshUser;
-                        remote.identityFile = sshKey;
-                        remote.allowAnyHosts = true;
-                        sshCommand remote: remote, command: "aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 392405208147.dkr.ecr.us-east-2.amazonaws.com"
-                        sshCommand remote: remote, command: "docker stop cardb"
-                        sshCommand remote: remote, command: "docker rm cardb"
-                        sshCommand remote: remote, command: "docker rmi 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb"
-                        sshCommand remote: remote, command: "docker pull 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
-                        sshCommand remote: remote, command: "docker run -d -p 8080:8080 --name cardb 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
-                    }
-                }
-            }
-        }
         stage ('Deploy in kubernetes'){
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'training-aws-creds', secretKeyVariable:
@@ -97,7 +73,7 @@ pipeline {
                                         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
                                         chmod +x kubectl
                                         mv kubectl /usr/local/bin/
-                                        aws eks --region us-east-2 update-kubeconfig --name test-eks-0NTOw0js
+                                        aws eks --region us-east-2 update-kubeconfig --name test-eks-oPmKw5Gs
                                         kubectl apply -f deployment.yaml
                                     '''
                             }
