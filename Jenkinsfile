@@ -89,5 +89,19 @@ pipeline {
                 }
             }
         }
+        stage ('Deploy in kubernetes'){
+            steps {
+                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'training-aws-creds', secretKeyVariable:
+                            'AWS_SECRET_ACCESS_KEY')]){
+                                 sh '''
+                                        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                                        chmod +x kubectl
+                                        mv kubectl /usr/local/bin/
+                                        aws eks --region us-east-2 update-kubeconfig --name test-eks-0NTOw0js
+                                        kubectl apply -f deployment.yaml
+                                    '''
+                            }
+            }
+        }
     }
 }
