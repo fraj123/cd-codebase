@@ -24,11 +24,17 @@ pipeline {
             }
         }
         stage("Build Docker Image") {
+            when {
+                branch 'develop'
+            }
             steps {
                 sh "./mvnw spring-boot:build-image -Dsnyk.skip"
             }
         }
         stage("Push Docker image to Docker Hub") {
+            when {
+                branch 'develop'
+            }
             environment {
                 DOCKERHUB_COMMON_CREDS = credentials('dockerhub-common-creds')
                 NAME="cardb"
@@ -54,33 +60,27 @@ pipeline {
                 '''
             }
         }
-        stage("Push Docker Image to ECR") {
-            environment {
-                AWS_DEFAULT_REGION="us-east-2"
-            }
-            steps {
-                withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'training-aws-creds', secretKeyVariable:
-                            'AWS_SECRET_ACCESS_KEY')]) {
-                    sh "aws ecr get-login-password | docker login --username AWS --password-stdin 392405208147.dkr.ecr.us-east-2.amazonaws.com"
-                    sh "docker tag cardb:0.0.1-SNAPSHOT 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
-                    sh "docker push 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
-                }
-            }
-        }
         stage ('Deploy in kubernetes'){
+            when {
+                branch 'develop'
+            }
+            environment {
+                DOCKERHUB_COMMON_CREDS = credentials('dockerhub-common-creds')
+                NAME="cardb"
+                VERSION="${env.BUILD_ID}"
+            }
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'training-aws-creds', secretKeyVariable:
                             'AWS_SECRET_ACCESS_KEY')]){
-                                 sh '''
-                                        curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-                                        chmod +x kubectl
-                                        mv kubectl /usr/local/bin/
-                                        curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
-                                        chmod +x ./kubectl-argo-rollouts-linux-amd64
-                                        mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
-                                        aws eks --region us-east-2 update-kubeconfig --name test-eks-oPmKw5Gs
-                                    '''
-                            }
+                    sh "curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                    sh "chmod +x kubectl"
+                    sh "mv kubectl /usr/local/bin/"
+                    sh "curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64"
+                    sh "chmod +x ./kubectl-argo-rollouts-linux-amd64"
+                    sh "mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts"
+                    sh "aws eks --region us-east-2 update-kubeconfig --name $env.CLUSTER_NAME"
+                    sh "kubectl argo rollouts set image $NAME $NAME=$DOCKERHUB_COMMON_CREDS_USR/$NAME:$VERSION -n $NAME"
+                }
             }
         }
     }
