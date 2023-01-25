@@ -1,27 +1,34 @@
-apiVersion: apps/v1
-kind: Deployment
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
 metadata:
-  creationTimestamp: null
-  labels:
-    app: cardb
   name: cardb
 spec:
-  replicas: 3
+  replicas: 5
   selector:
     matchLabels:
-      app: cardb
-  strategy: {}
+      app: nginx
   template:
     metadata:
-      creationTimestamp: null
       labels:
         app: cardb
     spec:
       containers:
-      - image: fraj24/cardb
-        name: cardb
-        resources: {}
-status: {}
+      - name: cardb
+        image: fraj24/cardb
+        ports:
+        - containerPort: 8080
+  minReadySeconds: 30
+  revisionHistoryLimit: 3
+  strategy:
+    canary: 
+      maxSurge: "25%"
+      maxUnavailable: 0
+      steps:
+      - setWeight: 10
+      - pause:
+          duration: 60
+      - setWeight: 20
+      - pause: {} 
 ---
 apiVersion: v1
 kind: Service
@@ -39,5 +46,3 @@ spec:
   selector:
     app: cardb
   type: ClusterIP
-status:
-  loadBalancer: {}
