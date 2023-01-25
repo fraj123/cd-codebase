@@ -18,8 +18,9 @@ spec:
         app: cardb
     spec:
       containers:
-      - image: fraj24/cardb
+      - image: 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest
         name: cardb
+        imagePullPolicy:  "Always"
         resources: {}
 status: {}
 ---
