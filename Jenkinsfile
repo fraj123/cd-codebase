@@ -67,7 +67,6 @@ pipeline {
                 }
             }
         }
-<<<<<<< HEAD
         stage ('Deploy in kubernetes'){
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'training-aws-creds', secretKeyVariable:
@@ -84,7 +83,5 @@ pipeline {
                             }
             }
         }
-=======
->>>>>>> 4b1a81fca07c3a467ab2b2e42d425b025bf4b09e
     }
 }
