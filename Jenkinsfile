@@ -31,11 +31,13 @@ pipeline {
         stage("Push Docker image to Docker Hub") {
             environment {
                 DOCKERHUB_COMMON_CREDS = credentials('dockerhub-common-creds')
+                NAME="cardb"
+                VERSION="${env.BUILD_ID}"
             }
             steps {
-                sh "docker tag cardb:0.0.1-SNAPSHOT $DOCKERHUB_COMMON_CREDS_USR/cardb"
+                sh "docker tag cardb:0.0.1-SNAPSHOT $DOCKERHUB_COMMON_CREDS_USR/$NAME:$VERSION"
                 sh "docker login --username $DOCKERHUB_COMMON_CREDS_USR --password $DOCKERHUB_COMMON_CREDS_PSW"
-                sh "docker push $DOCKERHUB_COMMON_CREDS_USR/cardb"
+                sh "docker push $DOCKERHUB_COMMON_CREDS_USR/$NAME:$VERSION"
             }
         }
         stage("Install AWS") {
@@ -65,30 +67,7 @@ pipeline {
                 }
             }
         }
-        stage('Deploy on EC2') {
-            steps {
-                withCredentials([sshUserPrivateKey(
-                credentialsId: 'training-deploy-creds', 
-                keyFileVariable: 'sshKey', 
-                usernameVariable: 'sshUser')]) {
-                    script {
-                        sleep 15
-                        def remote = [:];
-                        remote.name = "Deploy_Server";
-                        remote.host = "52.14.130.34";
-                        remote.user = sshUser;
-                        remote.identityFile = sshKey;
-                        remote.allowAnyHosts = true;
-                        sshCommand remote: remote, command: "aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 392405208147.dkr.ecr.us-east-2.amazonaws.com"
-                        sshCommand remote: remote, command: "docker stop cardb"
-                        sshCommand remote: remote, command: "docker rm cardb"
-                        sshCommand remote: remote, command: "docker rmi 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb"
-                        sshCommand remote: remote, command: "docker pull 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
-                        sshCommand remote: remote, command: "docker run -d -p 8080:8080 --name cardb 392405208147.dkr.ecr.us-east-2.amazonaws.com/cardb:latest"
-                    }
-                }
-            }
-        }
+<<<<<<< HEAD
         stage ('Deploy in kubernetes'){
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'training-aws-creds', secretKeyVariable:
@@ -97,11 +76,15 @@ pipeline {
                                         curl -LO "https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
                                         chmod +x kubectl
                                         mv kubectl /usr/local/bin/
-                                        aws eks --region us-east-2 update-kubeconfig --name test-eks-0NTOw0js
-                                        kubectl apply -f deployment.yaml
+                                        curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64
+                                        chmod +x ./kubectl-argo-rollouts-linux-amd64
+                                        mv kubectl-argo-rollouts-linux-amd64 /usr/local/bin/kubectl-argo-rollouts
+                                        aws eks --region us-east-2 update-kubeconfig --name test-eks-oPmKw5Gs
                                     '''
                             }
             }
         }
+=======
+>>>>>>> 4b1a81fca07c3a467ab2b2e42d425b025bf4b09e
     }
 }
