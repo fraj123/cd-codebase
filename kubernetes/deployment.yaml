@@ -6,7 +6,7 @@ metadata:
     app: cardb
   name: cardb
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: cardb
