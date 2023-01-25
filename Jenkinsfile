@@ -72,7 +72,7 @@ pipeline {
             steps {
                 withCredentials([aws(accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'training-aws-creds', secretKeyVariable:
                             'AWS_SECRET_ACCESS_KEY')]){
-                    sh "curl -LO https://dl.k8s.io/release/$(curl -L -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+                    sh "curl -LO https://dl.k8s.io/release/v1.26.1/bin/linux/amd64/kubectl"
                     sh "chmod +x kubectl"
                     sh "mv kubectl /usr/local/bin/"
                     sh "curl -LO https://github.com/argoproj/argo-rollouts/releases/latest/download/kubectl-argo-rollouts-linux-amd64"
