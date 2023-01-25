@@ -6,7 +6,7 @@ spec:
   replicas: 5
   selector:
     matchLabels:
-      app: nginx
+      app: cardb
   template:
     metadata:
       labels:
