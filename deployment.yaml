@@ -41,3 +41,36 @@ spec:
   type: ClusterIP
 status:
   loadBalancer: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: cardb
+spec:
+  replicas: 5
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: cardb
+    spec:
+      containers:
+      - name: cardb
+        image: fraj24/cardb
+        ports:
+        - containerPort: 8080
+  minReadySeconds: 30
+  revisionHistoryLimit: 3
+  strategy:
+    canary: 
+      maxSurge: "25%"
+      maxUnavailable: 0
+      steps:
+      - setWeight: 10
+      - pause:
+          duration: 60
+      - setWeight: 20
+      - pause: {} 
+
