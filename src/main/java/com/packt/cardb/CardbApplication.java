@@ -27,6 +27,7 @@ public class CardbApplication implements CommandLineRunner{
         carRepository.save(new Car("Ford", "Mustang", "Red", "ADF-1121", 2021, 59000));
         carRepository.save(new Car("Nissan", "Versa", "White", "SSJ-3002", 2019, 29000));
         carRepository.save(new Car("Toyota", "Prius", "Silver", "KKO-0212", 2020, 39000));
+	carRepository.save(new Car("Nissan", "Kicks", "Red", "KKO-0431", 2023, 39000));
 
         for (Car car: carRepository.findAll()) {
             logger.info(car.getBrand() + " " + car.getModel());
