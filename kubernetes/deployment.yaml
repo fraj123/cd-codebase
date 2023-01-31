@@ -14,21 +14,18 @@ spec:
     spec:
       containers:
       - name: cardb
-        image: fraj24/cardb
+        image: fraj24/cardb:16
         ports:
         - containerPort: 8080
   minReadySeconds: 30
   revisionHistoryLimit: 3
   strategy:
     canary: 
-      maxSurge: "25%"
-      maxUnavailable: 0
+      stableService: cardb-stable
+      canaryService: cardb-canary
       steps:
-      - setWeight: 10
-      - pause:
-          duration: 60
-      - setWeight: 20
-      - pause: {} 
+      - setWeight: 50
+      - pause: {}
 ---
 apiVersion: v1
 kind: Service
@@ -36,11 +33,26 @@ metadata:
   creationTimestamp: null
   labels:
     app: cardb
-  name: cardb
+  name: cardb-stable
 spec:
   ports:
-  - name: 8080-8080
-    port: 8080
+  - port: 8080
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: cardb
+  type: ClusterIP
+---
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app: cardb
+  name: cardb-canary
+spec:
+  ports:
+  - port: 8080
     protocol: TCP
     targetPort: 8080
   selector:
